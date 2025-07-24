@@ -26,7 +26,7 @@ monthly_charges = st.slider("Monthly Charges", 0.0, 150.0, 70.0)
 total_charges = st.slider("Total Charges", 0.0, 10000.0, 2000.0)
 
 #Construct user input
-user_input = pd.dataframe({
+user_input = pd.DataFrame({
     'gender':[gender],
     'SeniorCitizen':[senior],
     'Partner':[partner],
