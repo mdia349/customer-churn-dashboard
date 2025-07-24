@@ -11,7 +11,7 @@ st.write("Predict whether a telecom customer is likely to churn.")
 
 #Sidebar inputs
 gender = st.selectbox("Gender", ["Male", "Female"])
-senior = st.selectbox("Senior Citizen", [0, 1])
+senior_text = st.selectbox("Senior Citizen", ["Yes", "No"])
 partner = st.selectbox("Has Partner", ["Yes", "No"])
 dependents = st.selectbox("Has Dependents", ["Yes", "No"])
 tenure = st.slider("Tenure (Months)", 0, 72, 12)
@@ -24,6 +24,9 @@ paperless_billing = st.selectbox("Paperless Billing" , ["Yes", "No"])
 payment_method = st.selectbox("Payment Method", ["Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"])
 monthly_charges = st.slider("Monthly Charges", 0.0, 150.0, 70.0)
 total_charges = st.slider("Total Charges", 0.0, 10000.0, 2000.0)
+
+#Convert senior text to binary
+senior = 1 if senior_text == "Yes" else 0
 
 #Construct user input
 user_input = pd.DataFrame({
