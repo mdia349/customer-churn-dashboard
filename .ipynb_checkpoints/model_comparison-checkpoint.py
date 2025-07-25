@@ -38,12 +38,6 @@ df['TenureGroup'] = pd.cut(
 
 df['IsElectronicCheck'] = (df['PaymentMethod'] == 'Electronic check').astype(int)
 
-df['PaymentMethodRisk'] = df['PaymentMethod'].map({
-    'Electronic check': 2,
-    'Mailed check': 1,
-    'Bank transfer (automatic)': 0,
-    'Credit card (automatic)': 0
-})
 
 df['HasFiber'] = (df['InternetService'] == 'Fiber optic').astype(int)
 df['FiberHighCharges'] = ((df['HasFiber'] == 1) & (df['MonthlyCharges'] > 80)).astype(int)
