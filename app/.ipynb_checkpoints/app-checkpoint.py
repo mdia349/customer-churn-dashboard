@@ -92,7 +92,7 @@ def load_data():
     df = pd.read_csv("data/telco_churn.csv")
     df['Churn'] = df['Churn'].map({'Yes': 1, 'No': 0})
     df['ChurnLabel'] = df['Churn'].map({0: 'Stayed', 1: 'Churned'})
-    df['SeniorLabel'] = df['SeniorCitizen'].map({0: 'No', 1: 'Yes'})
+    df['Senior'] = df['SeniorCitizen'].map({0: 'No', 1: 'Yes'})
     return df
 
 df = load_data()
@@ -115,7 +115,7 @@ st.plotly_chart(fig_pie, use_container_width=True)
 # Dropdown to select category
 st.subheader("Churn by Category")
 categorical_cols = [
-    "gender", "SeniorLabel", "Partner", "Dependents", "PhoneService",
+    "gender", "Senior", "Partner", "Dependents", "PhoneService",
     "MultipleLines", "InternetService", "OnlineSecurity", "Contract",
     "PaperlessBilling", "PaymentMethod"
 ]
@@ -197,7 +197,7 @@ precision = precision_score(y_val, y_pred)
 recall = recall_score(y_val, y_pred)
 f1 = f1_score(y_val, y_pred)
 
-st.subheader("\U0001F9EA Model Performance Metrics")
+st.subheader("Model Performance Metrics")
 st.write(f"**Threshold Used:** {best_threshold:.2f}")
 st.write(f"**Accuracy:** {accuracy:.2%}")
 st.write(f"**Precision:** {precision:.2%}")
