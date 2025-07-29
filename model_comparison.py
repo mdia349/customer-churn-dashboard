@@ -99,7 +99,7 @@ param_grid_xgb = {
 # Define models with tuning
 models = {
     "Logistic Regression (Tuned)": GridSearchCV(
-        LogisticRegression(max_iter=10000),
+        LogisticRegression(max_iter=10000, random_state=42),
         param_grid=param_grid_lr,
         cv=5,
         scoring='f1',
@@ -112,8 +112,8 @@ models = {
         scoring='f1',
         n_jobs=-1
     ),
-    "XGBoost (Tuned - Precision)": GridSearchCV(
-        XGBClassifier(eval_metric='logloss'),
+    "XGBoost (Tuned)": GridSearchCV(
+        XGBClassifier(eval_metric='logloss', random_state=42),
         param_grid=param_grid_xgb,
         cv=5,
         scoring='f1',

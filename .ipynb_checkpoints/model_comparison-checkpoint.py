@@ -112,7 +112,7 @@ models = {
         scoring='f1',
         n_jobs=-1
     ),
-    "XGBoost (Tuned - Precision)": GridSearchCV(
+    "XGBoost (Tuned)": GridSearchCV(
         XGBClassifier(eval_metric='logloss'),
         param_grid=param_grid_xgb,
         cv=5,
