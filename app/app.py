@@ -15,7 +15,7 @@ from sklearn.metrics import (
 import matplotlib.pyplot as plt
 import numpy as np
 
-# --- Load model and features ---
+# Load model, features, and threshold
 model = joblib.load('models/best_model.pkl')
 feature_columns = joblib.load('models/feature_columns.pkl')
 try:
@@ -26,7 +26,7 @@ except:
 st.title("\U0001F4C9 Customer Churn Prediction Dashboard")
 st.write("Use this tool to predict telecom customer churn and explore historical churn trends.")
 
-# --- User Input Form ---
+# User Input Form
 st.sidebar.header("\U0001F4CB Customer Attributes")
 gender = st.sidebar.selectbox("Gender", ["Male", "Female"])
 senior_text = st.sidebar.selectbox("Senior Citizen", ["No", "Yes"])
@@ -50,10 +50,8 @@ payment_method = st.sidebar.selectbox("Payment Method", [
 monthly_charges = st.sidebar.slider("Monthly Charges", 0.0, 150.0, 70.0)
 total_charges = st.sidebar.slider("Total Charges", 0.0, 10000.0, 2000.0)
 
-# --- Feature Engineering ---
 
-
-# --- Prepare Input Data ---
+#  User input data
 user_input = pd.DataFrame({
     'gender': [gender],
     'SeniorCitizen': [senior],
@@ -71,10 +69,28 @@ user_input = pd.DataFrame({
     'TotalCharges': [total_charges],
 })
 
+# Engineered features for user input data
+
+user_input['IsMonthly'] = (user_input['Contract'] == 'Month-to-month').astype(int)
+user_input['IsNewCustomer'] = (user_input['tenure'] < 6).astype(int)
+user_input['LogTenure'] = np.log1p(user_input['tenure'])
+
+contract_map = {'Month-to-month': 1, 'One year': 12, 'Two year': 24}
+user_input['ContractLength'] = user_input['Contract'].map(contract_map)
+user_input['TenureToContractRatio'] = user_input['tenure'] / user_input['ContractLength'].replace(0, 1)
+
+user_input['IsElectronicCheck'] = (user_input['PaymentMethod'] == 'Electronic check').astype(int)
+user_input['HasFiber'] = (user_input['InternetService'] == 'Fiber optic').astype(int)
+user_input['FiberHighCharges'] = ((user_input['HasFiber'] == 1) & (user_input['MonthlyCharges'] > 80)).astype(int)
+user_input['FiberWithoutSupport'] = (
+    (user_input['InternetService'] == 'Fiber optic') &
+    (user_input['OnlineSecurity'] == 'No')
+).astype(int)
+
 input_encoded = pd.get_dummies(user_input)
 input_encoded = input_encoded.reindex(columns=feature_columns, fill_value=0)
 
-# --- Prediction ---
+# Prediction
 st.header("\U0001F52E Churn Prediction")
 threshold = st.slider("Prediction Threshold", 0.0, 1.0, float(best_threshold), 0.01)
 
@@ -86,7 +102,7 @@ if st.button("Predict Churn"):
     else:
         st.success("\u2705 This customer is likely to stay.")
 
-# --- Load data for EDA ---
+# Load data for EDA
 @st.cache_data
 def load_data():
     df = pd.read_csv("data/telco_churn.csv")
@@ -97,7 +113,7 @@ def load_data():
 
 df = load_data()
 
-# --- EDA Section ---
+# EDA Section
 st.header("\U0001F4CA Churn Trends and Data Exploration")
 
 # Pie Chart
@@ -132,7 +148,7 @@ fig_bar = px.histogram(
 fig_bar.update_layout(xaxis_title=selected_col, yaxis_title="Count")
 st.plotly_chart(fig_bar, use_container_width=True)
 
-# Box plot: Monthly Charges
+# Box plot
 st.subheader("Monthly Charges by Churn")
 fig_box = px.box(
     df,
@@ -145,7 +161,7 @@ fig_box = px.box(
 )
 st.plotly_chart(fig_box, use_container_width=True)
 
-# --- Model Evaluation Section ---
+#  model Evaluation Section
 st.header("\U0001F9EA Model Evaluation")
 
 @st.cache_data
@@ -156,7 +172,7 @@ def load_model_test_data():
     df.dropna(inplace=True)
     df['Churn'] = df['Churn'].map({'Yes': 1, 'No': 0})
 
-    # --- Feature engineering (same as training) ---
+    # Feature engineering (same as training)
     df['IsMonthly'] = (df['Contract'] == 'Month-to-month').astype(int)
     df['IsNewCustomer'] = (df['tenure'] < 6).astype(int)
     df['LogTenure'] = np.log1p(df['tenure'])
@@ -226,4 +242,3 @@ ax_roc.set_ylabel('True Positive Rate')
 ax_roc.set_title('Receiver Operating Characteristic')
 ax_roc.legend(loc="lower right")
 st.pyplot(fig_roc)
-
